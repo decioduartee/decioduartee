@@ -1,7 +1,7 @@
 ### Opa! eu sou o Decio Duarte :3
 
 <div align="center">
-  <a style="display: flex !important" href="https://github.com/decioduartee">
+  <a style="display: inline_block" href="https://github.com/decioduartee">
   <img width="450em" height="180em" src="https://github-readme-stats.vercel.app/api?username=decioduartee&show_icons=true&theme=dark&include_all_commits=true&count_private=true"/>
   <img width="450em" height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=decioduartee&layout=compact&langs_count=7&theme=dark"/>
 </div>
