@@ -1,4 +1,4 @@
-### Opa! eu sou o Decio Duarte :3
+### Oiii eu sou o Decio Duarte, criadora de conteúdo de programação e tecnologia!
 
 <div align="center">
   <a style="display: inline_block" href="https://github.com/decioduartee">
