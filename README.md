@@ -1,4 +1,4 @@
-```cmd
+```yaml
 name: Décio Duarte
 role: React Native Developer
 
