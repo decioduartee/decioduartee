@@ -1,7 +1,7 @@
 <h1 align="center">Olá! Eu sou o Décio Duarte 👋</h1>
 
 <p align="center">
-  Desenvolvedor Front-end apaixonado por criar aplicações modernas, intuitivas e com foco na experiência do usuário.
+  Desenvolvedor Front-end • Back-end apaixonado por criar aplicações modernas, intuitivas e com foco na experiência do usuário.
 </p>
 
 ---
