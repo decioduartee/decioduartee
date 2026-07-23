@@ -1,3 +1,4 @@
+```cmd
 name: Décio Duarte
 role: React Native Developer
 
@@ -18,3 +19,4 @@ currently:
 
 editor: VS Code
 os: Windows 11
+```
