@@ -39,6 +39,7 @@
 ```yaml
 name: Décio Duarte
 role: React Native Developer
+
 location: São Paulo, Brasil
 
 stack:
@@ -48,6 +49,12 @@ stack:
   - TypeScript
   - Node.js
 
-current_project: Piggo Finance
+currently:
+  project: Piggo Finance
+  learning:
+    - Clean Architecture
+    - React Native Animations
+
 editor: VS Code
+os: Windows 11 | Linux Ubuntu 
 ```
