@@ -23,6 +23,12 @@
     "deletions": 0,
     "my_commits": 1
   },
+  "decioduartee/PiggoFinance": {
+    "additions": 0,
+    "commit_count": 0,
+    "deletions": 0,
+    "my_commits": 0
+  },
   "decioduartee/SiteCoinMaster": {
     "additions": 2918,
     "commit_count": 99,
@@ -35,10 +41,16 @@
     "deletions": 0,
     "my_commits": 0
   },
+  "decioduartee/consultaedp": {
+    "additions": 42,
+    "commit_count": 1,
+    "deletions": 0,
+    "my_commits": 1
+  },
   "decioduartee/decioduartee": {
-    "additions": 359,
-    "commit_count": 25,
-    "deletions": 312,
-    "my_commits": 25
+    "additions": 1196,
+    "commit_count": 35,
+    "deletions": 423,
+    "my_commits": 35
   }
 }
