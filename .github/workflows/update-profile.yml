@@ -8,6 +8,8 @@ on:
       - main
     paths:
       - today.py
+      - requirements.txt
+      - .github/workflows/update-profile.yml
 
   schedule:
     - cron: "0 */12 * * *"
@@ -31,7 +33,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
 
       - name: Install dependencies
         run: |
