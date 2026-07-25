@@ -27,6 +27,7 @@ BIRTHDAY = dt.datetime(2000, 4, 10)
 GRAPHQL_URL = "https://api.github.com/graphql"
 SVG_FILES = ("dark_mode.svg", "light_mode.svg")
 CACHE_DIR = Path("cache")
+PROFILE_LINE_WIDTH = 61
 
 
 def build_cache_file(user_name: str) -> Path:
@@ -394,29 +395,85 @@ def set_svg_text(root: etree._Element, element_id: str, value: Any) -> None:
         element.text = str(value)
 
 
-def set_justified_value(
-    root: etree._Element,
-    element_id: str,
-    value: Any,
-    target_width: int = 0,
-) -> None:
+def set_formatted_value(root: etree._Element, element_id: str, value: Any) -> None:
     formatted = f"{value:,}" if isinstance(value, int) else str(value)
     set_svg_text(root, element_id, formatted)
 
-    if target_width <= 0:
-        set_svg_text(root, f"{element_id}_dots", "")
-        return
 
-    fill_length = max(1, target_width - len(formatted))
+def build_leader(label: str, value: Any, line_width: int = PROFILE_LINE_WIDTH) -> str:
+    formatted = f"{value:,}" if isinstance(value, int) else str(value)
+    fixed_width = len(". ") + len(label) + len(":") + len(formatted)
+    dot_count = max(1, line_width - fixed_width - len("  "))
+    return f" {'.' * dot_count} "
 
-    if fill_length == 1:
-        dots = " "
-    elif fill_length == 2:
-        dots = ". "
-    else:
-        dots = f" {'.' * (fill_length - 2)} "
 
-    set_svg_text(root, f"{element_id}_dots", dots)
+def build_segment_leader(label: str, value: Any, segment_width: int) -> str:
+    formatted = f"{value:,}" if isinstance(value, int) else str(value)
+    fixed_width = len(label) + len(":") + len(formatted)
+    dot_count = max(1, segment_width - fixed_width - len("  "))
+    return f" {'.' * dot_count} "
+
+
+def build_remaining_leader(prefix: str, value: Any, suffix: str = "") -> str:
+    formatted = f"{value:,}" if isinstance(value, int) else str(value)
+    dot_count = max(
+        1,
+        PROFILE_LINE_WIDTH - len(prefix) - len(formatted) - len(suffix) - len("  "),
+    )
+    return f" {'.' * dot_count} "
+
+
+def set_leader_value(
+    root: etree._Element,
+    element_id: str,
+    label: str,
+    value: Any,
+    line_width: int = PROFILE_LINE_WIDTH,
+) -> None:
+    set_formatted_value(root, element_id, value)
+    set_svg_text(root, f"{element_id}_dots", build_leader(label, value, line_width))
+
+
+def set_github_stat_leaders(root: etree._Element, stats: ProfileStats) -> None:
+    repos = f"{stats.owned_repos:,}"
+    contributed = f"{stats.contributed_repos:,}"
+    stars = f"{stats.stars:,}"
+    commits = f"{stats.commits:,}"
+    followers = f"{stats.followers:,}"
+    net_lines = f"{stats.net_lines:,}"
+    deletions = f"{stats.deletions:,}"
+
+    repo_dots = build_segment_leader("Repos", stats.owned_repos, 14)
+    set_svg_text(root, "repo_data_dots", repo_dots)
+
+    star_prefix = (
+        f". Repos:{repo_dots}{repos} "
+        f"{{Contributed: {contributed}}} | Stars:"
+    )
+    set_svg_text(root, "star_data_dots", build_remaining_leader(star_prefix, stars))
+
+    commit_dots = build_segment_leader("Commits", stats.commits, 34)
+    set_svg_text(root, "commit_data_dots", commit_dots)
+
+    follower_prefix = f". Commits:{commit_dots}{commits} | Followers:"
+    set_svg_text(
+        root,
+        "follower_data_dots",
+        build_remaining_leader(follower_prefix, followers),
+    )
+
+    loc_dots = build_segment_leader("Lines of Code on GitHub", stats.net_lines, 36)
+    set_svg_text(root, "loc_data_dots", loc_dots)
+
+    loc_del_prefix = (
+        f". Lines of Code on GitHub:{loc_dots}{net_lines} "
+        f"( {stats.additions:,}++, "
+    )
+    set_svg_text(
+        root,
+        "loc_del_dots",
+        build_remaining_leader(loc_del_prefix, deletions, "-- )"),
+    )
 
 
 def update_svg(filename: str, stats: ProfileStats) -> None:
@@ -429,15 +486,16 @@ def update_svg(filename: str, stats: ProfileStats) -> None:
     tree = etree.parse(str(path))
     root = tree.getroot()
 
-    set_justified_value(root, "age_data", stats.age, 32)
-    set_justified_value(root, "commit_data", stats.commits, 24)
-    set_justified_value(root, "star_data", stats.stars, 16)
-    set_justified_value(root, "repo_data", stats.owned_repos, 8)
-    set_justified_value(root, "contrib_data", stats.contributed_repos)
-    set_justified_value(root, "follower_data", stats.followers, 12)
-    set_justified_value(root, "loc_data", stats.net_lines, 11)
-    set_justified_value(root, "loc_add", stats.additions)
-    set_justified_value(root, "loc_del", stats.deletions, 7)
+    set_leader_value(root, "age_data", "Uptime", stats.age)
+    set_formatted_value(root, "commit_data", stats.commits)
+    set_formatted_value(root, "star_data", stats.stars)
+    set_formatted_value(root, "repo_data", stats.owned_repos)
+    set_formatted_value(root, "contrib_data", stats.contributed_repos)
+    set_formatted_value(root, "follower_data", stats.followers)
+    set_formatted_value(root, "loc_data", stats.net_lines)
+    set_formatted_value(root, "loc_add", stats.additions)
+    set_formatted_value(root, "loc_del", stats.deletions)
+    set_github_stat_leaders(root, stats)
 
     tree.write(
         str(path),
