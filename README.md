@@ -5,3 +5,12 @@
     <img alt="GitHub Stats" src="./light_mode.svg">
   </picture>
 </a>
+
+## Update stats
+
+```powershell
+$env:ACCESS_TOKEN="YOUR_GITHUB_TOKEN"
+python today.py --login decioduartee
+```
+
+You can also set `$env:GITHUB_LOGIN="decioduartee"` and run `python today.py`.

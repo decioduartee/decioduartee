@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import datetime as dt
 import hashlib
 import json
@@ -18,14 +19,21 @@ from lxml import etree
 # Profile configuration
 # ============================================================
 
-USER_NAME = os.getenv("USER_NAME", "decioduartee")
+DEFAULT_USER_NAME = "decioduartee"
+USER_NAME = os.getenv("GITHUB_LOGIN", os.getenv("USER_NAME", DEFAULT_USER_NAME)).strip()
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "").strip()
 BIRTHDAY = dt.datetime(2000, 4, 10)
 
 GRAPHQL_URL = "https://api.github.com/graphql"
 SVG_FILES = ("dark_mode.svg", "light_mode.svg")
 CACHE_DIR = Path("cache")
-CACHE_FILE = CACHE_DIR / f"{hashlib.sha256(USER_NAME.encode('utf-8')).hexdigest()}.json"
+
+
+def build_cache_file(user_name: str) -> Path:
+    return CACHE_DIR / f"{hashlib.sha256(user_name.encode('utf-8')).hexdigest()}.json"
+
+
+CACHE_FILE = build_cache_file(USER_NAME)
 
 QUERY_COUNT = 0
 
@@ -69,7 +77,9 @@ class GitHubClient:
                 "ACCESS_TOKEN was not found.\n"
                 "PowerShell example:\n"
                 '$env:ACCESS_TOKEN="YOUR_GITHUB_TOKEN"\n'
-                "Then run: python today.py"
+                '$env:GITHUB_LOGIN="YOUR_GITHUB_LOGIN"\n'
+                "Then run: python today.py\n"
+                "Or run: python today.py --login YOUR_GITHUB_LOGIN"
             )
 
         self.headers = {
@@ -388,21 +398,23 @@ def set_justified_value(
     root: etree._Element,
     element_id: str,
     value: Any,
-    target_length: int = 0,
+    target_width: int = 0,
 ) -> None:
     formatted = f"{value:,}" if isinstance(value, int) else str(value)
     set_svg_text(root, element_id, formatted)
 
-    missing = max(0, target_length - len(formatted))
+    if target_width <= 0:
+        set_svg_text(root, f"{element_id}_dots", "")
+        return
 
-    if missing == 0:
-        dots = ""
-    elif missing == 1:
+    fill_length = max(1, target_width - len(formatted))
+
+    if fill_length == 1:
         dots = " "
-    elif missing == 2:
+    elif fill_length == 2:
         dots = ". "
     else:
-        dots = f" {'.' * missing} "
+        dots = f" {'.' * (fill_length - 2)} "
 
     set_svg_text(root, f"{element_id}_dots", dots)
 
@@ -417,13 +429,13 @@ def update_svg(filename: str, stats: ProfileStats) -> None:
     tree = etree.parse(str(path))
     root = tree.getroot()
 
-    set_justified_value(root, "age_data", stats.age)
-    set_justified_value(root, "commit_data", stats.commits, 22)
-    set_justified_value(root, "star_data", stats.stars, 14)
-    set_justified_value(root, "repo_data", stats.owned_repos, 6)
+    set_justified_value(root, "age_data", stats.age, 32)
+    set_justified_value(root, "commit_data", stats.commits, 24)
+    set_justified_value(root, "star_data", stats.stars, 16)
+    set_justified_value(root, "repo_data", stats.owned_repos, 8)
     set_justified_value(root, "contrib_data", stats.contributed_repos)
-    set_justified_value(root, "follower_data", stats.followers, 10)
-    set_justified_value(root, "loc_data", stats.net_lines, 9)
+    set_justified_value(root, "follower_data", stats.followers, 12)
+    set_justified_value(root, "loc_data", stats.net_lines, 11)
     set_justified_value(root, "loc_add", stats.additions)
     set_justified_value(root, "loc_del", stats.deletions, 7)
 
@@ -441,7 +453,28 @@ def update_svg(filename: str, stats: ProfileStats) -> None:
 # Main
 # ============================================================
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Update GitHub profile SVGs with account statistics.",
+    )
+    parser.add_argument(
+        "--login",
+        default=USER_NAME or DEFAULT_USER_NAME,
+        help=(
+            "GitHub login to load. Defaults to GITHUB_LOGIN, USER_NAME, "
+            f"or {DEFAULT_USER_NAME}."
+        ),
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    global CACHE_FILE, USER_NAME
+
+    args = parse_args()
+    USER_NAME = args.login.strip() or DEFAULT_USER_NAME
+    CACHE_FILE = build_cache_file(USER_NAME)
+
     started_at = time.perf_counter()
     client = GitHubClient(ACCESS_TOKEN)
 
