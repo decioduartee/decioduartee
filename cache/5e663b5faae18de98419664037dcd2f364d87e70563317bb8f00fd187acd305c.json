@@ -23,12 +23,6 @@
     "deletions": 0,
     "my_commits": 1
   },
-  "decioduartee/PiggoFinance": {
-    "additions": 0,
-    "commit_count": 0,
-    "deletions": 0,
-    "my_commits": 0
-  },
   "decioduartee/SiteCoinMaster": {
     "additions": 2918,
     "commit_count": 99,
@@ -41,16 +35,17 @@
     "deletions": 0,
     "my_commits": 0
   },
-  "decioduartee/consultaedp": {
-    "additions": 42,
-    "commit_count": 1,
-    "deletions": 0,
-    "my_commits": 1
-  },
   "decioduartee/decioduartee": {
+<<<<<<< HEAD
     "additions": 1485,
     "commit_count": 48,
     "deletions": 600,
     "my_commits": 48
+=======
+    "additions": 1495,
+    "commit_count": 49,
+    "deletions": 610,
+    "my_commits": 49
+>>>>>>> b8121d4 (Update profile)
   }
 }
